@@ -11,5 +11,8 @@ service = NordPoolService()
 prices = service.get_today_prices()
 
 for price in prices:
-
-    print(price)
+    print(
+        f"{price.start:%H:%M} - "
+        f"{price.end:%H:%M} : "
+        f"{price.spot_price_dkk:.2f} DKK/kWh"
+    )
