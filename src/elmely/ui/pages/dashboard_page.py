@@ -1,7 +1,6 @@
-from PySide6.QtWidgets import QLabel, QVBoxLayout
-from PySide6.QtGui import QFont
-from PySide6.QtWidgets import QWidget, QGridLayout
+from PySide6.QtWidgets import QGridLayout, QWidget
 
+from elmely.services.nordpool_service import NordPoolService
 from elmely.ui.widgets.info_card import InfoCard
 
 
@@ -11,21 +10,30 @@ class DashboardPage(QWidget):
         super().__init__()
 
         layout = QGridLayout(self)
+
         layout.setContentsMargins(30, 30, 30, 30)
         layout.setHorizontalSpacing(25)
         layout.setVerticalSpacing(25)
 
-        layout.setSpacing(20)
+        #
+        # Spotpris
+        #
+
+        self.spot_card = InfoCard(
+            "Spotpris",
+            "--,-- DKK",
+            "inkl. moms",
+        )
 
         layout.addWidget(
-            InfoCard(
-                "Spotpris",
-                "--,-- DKK",
-                "inkl. moms",
-            ),
+            self.spot_card,
             0,
             0,
         )
+
+        #
+        # Totalpris
+        #
 
         layout.addWidget(
             InfoCard(
@@ -37,6 +45,10 @@ class DashboardPage(QWidget):
             1,
         )
 
+        #
+        # Valutakurs
+        #
+
         layout.addWidget(
             InfoCard(
                 "Valutakurs",
@@ -47,6 +59,10 @@ class DashboardPage(QWidget):
             0,
         )
 
+        #
+        # Vær
+        #
+
         layout.addWidget(
             InfoCard(
                 "Vær",
@@ -56,3 +72,19 @@ class DashboardPage(QWidget):
             1,
             1,
         )
+
+        #
+        # Testdata
+        #
+
+        service = NordPoolService()
+
+        prices = service.get_today_prices()
+
+        if prices:
+
+            self.spot_card.set_value(
+                f"{prices[0].spot_price_dkk:.2f} DKK"
+            )
+
+            self.spot_card.set_updated("Testdata")

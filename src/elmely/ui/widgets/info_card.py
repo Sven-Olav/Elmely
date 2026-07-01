@@ -81,3 +81,14 @@ class InfoCard(QFrame):
             self.updated_label,
             alignment=Qt.AlignmentFlag.AlignRight
         )
+    def set_value(self, value: str):
+
+        self.value_label.setText(value)
+
+    def set_subtitle(self, subtitle: str):
+
+        self.subtitle_label.setText(subtitle)
+        
+    def set_updated(self, updated: str):
+
+        self.updated_label.setText(updated)
