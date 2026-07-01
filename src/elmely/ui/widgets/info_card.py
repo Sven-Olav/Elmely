@@ -61,21 +61,4 @@ class InfoCard(QFrame):
 
         layout.addWidget(subtitle_label)
 
-        self.setStyleSheet("""
-        QFrame#InfoCard {
-
-            background: white;
-
-            border-radius: 12px;
-
-            border: 1px solid #D9D9D9;
-
-        }
-
-        QLabel {
-
-            background: transparent;
-            border: none;
-
-        }
-        """)
+        

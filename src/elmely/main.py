@@ -7,11 +7,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from elmely.main_window import MainWindow
 from elmely.version import APP_NAME, ORGANIZATION, DOMAIN
-
+from elmely.ui.themes.theme_manager import ThemeManager
 
 def main():
 
     app = QApplication(sys.argv)
+    app.setStyleSheet(
+        ThemeManager.load_stylesheet()
+    )
 
     app.setApplicationName(APP_NAME)
     app.setOrganizationName(ORGANIZATION)
