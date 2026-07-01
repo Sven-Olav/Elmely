@@ -45,3 +45,16 @@ QListWidget::item:selected {
 QListWidget::item:hover {
     background: #E8F0FE;
 }
+/* ---------- InfoCard Typography ---------- */
+
+QFrame#InfoCard QLabel {
+
+    color: #202020;
+
+}
+
+QFrame#InfoCard QLabel:last-child {
+
+    color: #808080;
+
+}

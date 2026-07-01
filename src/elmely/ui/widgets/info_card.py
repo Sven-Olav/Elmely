@@ -14,51 +14,70 @@ class InfoCard(QFrame):
 
         self.setObjectName("InfoCard")
 
-        self.setMinimumWidth(260)
-        self.setMinimumHeight(160)
+        self.setMinimumSize(260, 180)
 
         layout = QVBoxLayout(self)
 
         layout.setContentsMargins(20, 20, 20, 20)
-        layout.setSpacing(8)
+        layout.setSpacing(6)
 
-        # ---------- Title ----------
+        #
+        # Tittel
+        #
 
-        title_label = QLabel(title)
+        self.title_label = QLabel(title)
 
-        title_font = QFont()
-        title_font.setPointSize(10)
+        title_font = QFont("Segoe UI", 10)
         title_font.setBold(True)
 
-        title_label.setFont(title_font)
+        self.title_label.setFont(title_font)
 
-        # ---------- Value ----------
+        #
+        # Stor verdi
+        #
 
-        value_label = QLabel(value)
+        self.value_label = QLabel(value)
 
-        value_font = QFont()
-        value_font.setPointSize(24)
+        value_font = QFont("Segoe UI", 22)
         value_font.setBold(True)
 
-        value_label.setFont(value_font)
+        self.value_label.setFont(value_font)
 
-        value_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        #
+        # Undertittel
+        #
 
-        # ---------- Subtitle ----------
+        self.subtitle_label = QLabel(subtitle)
 
-        subtitle_label = QLabel(subtitle)
+        subtitle_font = QFont("Segoe UI", 9)
 
-        subtitle_font = QFont()
-        subtitle_font.setPointSize(9)
+        self.subtitle_label.setFont(subtitle_font)
 
-        subtitle_label.setFont(subtitle_font)
+        #
+        # Oppdatert
+        #
 
-        layout.addWidget(title_label)
+        self.updated_label = QLabel("Oppdatert: --")
+
+        updated_font = QFont("Segoe UI", 8)
+
+        self.updated_label.setFont(updated_font)
+
+        #
+        # Layout
+        #
+
+        layout.addWidget(self.title_label)
 
         layout.addStretch()
 
-        layout.addWidget(value_label)
+        layout.addWidget(self.value_label)
 
-        layout.addWidget(subtitle_label)
+        layout.addWidget(self.subtitle_label)
 
-        
+        layout.addStretch()
+
+        layout.addWidget(
+            self.updated_label,
+            alignment=Qt.AlignmentFlag.AlignRight
+        )
