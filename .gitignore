@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual Environment
+.venv/
+
+# VS Code
+.vscode/
+
+# Build
+build/
+dist/
+
+# Logs
+logs/
+*.log
+
+# Database
+*.db
+*.sqlite3
+
+# Cache
+cache/
+
+# Exports
+exports/
+
+# Windows
+Thumbs.db
+
+# macOS
+.DS_Store
