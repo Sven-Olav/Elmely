@@ -11,7 +11,7 @@ from elmely import APP_NAME, VERSION
 from elmely.ui.navigation import Navigation
 from elmely.ui.themes.theme_manager import ThemeManager
 from elmely.ui.widgets.info_card import InfoCard
-
+from elmely.ui.pages.dashboard_page import DashboardPage
 
 class MainWindow(QMainWindow):
 
@@ -49,32 +49,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.navigation)
 
         # Høyre innhold
-        content = QWidget()
-
-        grid = QGridLayout(content)
-        grid.setSpacing(20)
-
-        grid.addWidget(
-            InfoCard("Spotpris", "--,-- DKK", "inkl. moms"),
-            0, 0
-        )
-
-        grid.addWidget(
-            InfoCard("Totalpris", "--,-- DKK", "inkl. afgifter"),
-            0, 1
-        )
-
-        grid.addWidget(
-            InfoCard("Valutakurs", "--,--", "DKK → NOK"),
-            1, 0
-        )
-
-        grid.addWidget(
-            InfoCard("Vær", "-- °C", "Bornholm"),
-            1, 1
-        )
-
-        layout.addWidget(content, 1)
+        layout.addWidget(DashboardPage(), 1)
 
         self.setCentralWidget(root)
 
