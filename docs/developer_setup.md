@@ -14,7 +14,7 @@ Install the following software:
 - Git
 - Python 3.14.x
 - Visual Studio Code
-
+- qtawesome
 ---
 
 # Clone / Open Project
