@@ -6,7 +6,6 @@ from datetime import datetime
 class Price:
 
     start: datetime
-
     end: datetime
 
     spot_price_dkk: float
