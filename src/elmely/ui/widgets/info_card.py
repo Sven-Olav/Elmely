@@ -1,4 +1,5 @@
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QFont
 from PySide6.QtWidgets import (
     QFrame,
     QLabel,
@@ -11,51 +12,70 @@ class InfoCard(QFrame):
     def __init__(self, title: str, value: str, subtitle: str = ""):
         super().__init__()
 
-        self.setMinimumSize(220, 140)
-        self.setMaximumHeight(140)
-
         self.setObjectName("InfoCard")
+
+        self.setMinimumWidth(260)
+        self.setMinimumHeight(160)
 
         layout = QVBoxLayout(self)
 
-        layout.setContentsMargins(16, 16, 16, 16)
+        layout.setContentsMargins(20, 20, 20, 20)
         layout.setSpacing(8)
 
-        self.title = QLabel(title)
+        # ---------- Title ----------
 
-        self.value = QLabel(value)
+        title_label = QLabel(title)
 
-        self.subtitle = QLabel(subtitle)
+        title_font = QFont()
+        title_font.setPointSize(10)
+        title_font.setBold(True)
 
-        value_font = self.value.font()
-        value_font.setPointSize(20)
+        title_label.setFont(title_font)
+
+        # ---------- Value ----------
+
+        value_label = QLabel(value)
+
+        value_font = QFont()
+        value_font.setPointSize(24)
         value_font.setBold(True)
 
-        self.value.setFont(value_font)
+        value_label.setFont(value_font)
 
-        self.value.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        value_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
-        layout.addWidget(self.title)
+        # ---------- Subtitle ----------
+
+        subtitle_label = QLabel(subtitle)
+
+        subtitle_font = QFont()
+        subtitle_font.setPointSize(9)
+
+        subtitle_label.setFont(subtitle_font)
+
+        layout.addWidget(title_label)
+
         layout.addStretch()
-        layout.addWidget(self.value)
-        layout.addWidget(self.subtitle)
+
+        layout.addWidget(value_label)
+
+        layout.addWidget(subtitle_label)
 
         self.setStyleSheet("""
         QFrame#InfoCard {
 
             background: white;
 
-            border: 1px solid #DADADA;
-
             border-radius: 12px;
+
+            border: 1px solid #D9D9D9;
 
         }
 
         QLabel {
 
-            border: none;
-
             background: transparent;
+            border: none;
 
         }
         """)

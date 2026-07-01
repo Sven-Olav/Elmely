@@ -1,3 +1,5 @@
+from PySide6.QtWidgets import QLabel, QVBoxLayout
+from PySide6.QtGui import QFont
 from PySide6.QtWidgets import QWidget, QGridLayout
 
 from elmely.ui.widgets.info_card import InfoCard
@@ -9,6 +11,9 @@ class DashboardPage(QWidget):
         super().__init__()
 
         layout = QGridLayout(self)
+        layout.setContentsMargins(30, 30, 30, 30)
+        layout.setHorizontalSpacing(25)
+        layout.setVerticalSpacing(25)
 
         layout.setSpacing(20)
 
