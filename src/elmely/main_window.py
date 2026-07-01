@@ -1,17 +1,17 @@
-from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QGridLayout,
     QHBoxLayout,
     QMainWindow,
+    QStackedWidget,
     QStatusBar,
     QWidget,
 )
 
 from elmely import APP_NAME, VERSION
 from elmely.ui.navigation import Navigation
-from elmely.ui.themes.theme_manager import ThemeManager
-from elmely.ui.widgets.info_card import InfoCard
 from elmely.ui.pages.dashboard_page import DashboardPage
+from elmely.ui.pages.placeholder_page import PlaceholderPage
+from elmely.ui.themes.theme_manager import ThemeManager
+
 
 class MainWindow(QMainWindow):
 
@@ -32,7 +32,6 @@ class MainWindow(QMainWindow):
     def _create_ui(self):
 
         root = QWidget()
-
         layout = QHBoxLayout(root)
 
         layout.setContentsMargins(
@@ -44,12 +43,40 @@ class MainWindow(QMainWindow):
 
         layout.setSpacing(self.theme.spacing)
 
-        # Venstremeny
-        self.navigation = Navigation()
-        layout.addWidget(self.navigation)
+        #
+        # Navigation
+        #
 
-        # Høyre innhold
-        layout.addWidget(DashboardPage(), 1)
+        self.navigation = Navigation()
+
+        #
+        # Pages
+        #
+
+        self.pages = QStackedWidget()
+
+        self.pages.addWidget(DashboardPage())
+        self.pages.addWidget(PlaceholderPage("⚡ Priser"))
+        self.pages.addWidget(PlaceholderPage("🌤 Vær"))
+        self.pages.addWidget(PlaceholderPage("📈 Analyse"))
+        self.pages.addWidget(PlaceholderPage("📅 Historikk"))
+        self.pages.addWidget(PlaceholderPage("📄 Eksport"))
+        self.pages.addWidget(PlaceholderPage("⚙ Innstillinger"))
+
+        #
+        # Connect signals
+        #
+
+        self.navigation.currentRowChanged.connect(
+            self.pages.setCurrentIndex
+        )
+
+        #
+        # Layout
+        #
+
+        layout.addWidget(self.navigation)
+        layout.addWidget(self.pages, 1)
 
         self.setCentralWidget(root)
 
@@ -57,4 +84,5 @@ class MainWindow(QMainWindow):
 
         status = QStatusBar()
         status.showMessage("Ready")
+
         self.setStatusBar(status)
