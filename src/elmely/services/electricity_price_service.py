@@ -5,7 +5,7 @@ from pathlib import Path
 from elmely.models.price import Price
 
 
-class NordPoolService:
+class ElectricityPriceService:
 
     def __init__(self):
 

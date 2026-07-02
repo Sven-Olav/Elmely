@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QGridLayout, QWidget
 
-from elmely.services.nordpool_service import NordPoolService
+from elmely.services.electricity_price_service import ElectricityPriceService
 from elmely.ui.widgets.info_card import InfoCard
 
 
@@ -25,11 +25,7 @@ class DashboardPage(QWidget):
             "inkl. moms",
         )
 
-        layout.addWidget(
-            self.spot_card,
-            0,
-            0,
-        )
+        layout.addWidget(self.spot_card, 0, 0)
 
         #
         # Totalpris
@@ -77,7 +73,7 @@ class DashboardPage(QWidget):
         # Testdata
         #
 
-        service = NordPoolService()
+        service = ElectricityPriceService()
 
         prices = service.get_today_prices()
 
