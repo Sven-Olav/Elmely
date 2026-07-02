@@ -1,0 +1,29 @@
+{
+  "total": 3,
+  "filters": "",
+  "limit": 3,
+  "dataset": "DayAheadPrices",
+  "records": [
+    {
+      "TimeUTC": "2026-07-03T21:45:00",
+      "TimeDK": "2026-07-03T23:45:00",
+      "PriceArea": "DE",
+      "DayAheadPriceEUR": 118.339996,
+      "DayAheadPriceDKK": 884.5323
+    },
+    {
+      "TimeUTC": "2026-07-03T21:45:00",
+      "TimeDK": "2026-07-03T23:45:00",
+      "PriceArea": "DK1",
+      "DayAheadPriceEUR": 94.010002,
+      "DayAheadPriceDKK": 702.67776
+    },
+    {
+      "TimeUTC": "2026-07-03T21:45:00",
+      "TimeDK": "2026-07-03T23:45:00",
+      "PriceArea": "DK2",
+      "DayAheadPriceEUR": 11.41,
+      "DayAheadPriceDKK": 85.284045
+    }
+  ]
+}

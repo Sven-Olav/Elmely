@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from PySide6.QtWidgets import QGridLayout, QWidget
 
 from elmely.services.electricity_price_service import ElectricityPriceService
@@ -70,17 +72,42 @@ class DashboardPage(QWidget):
         )
 
         #
-        # Testdata
+        # Live strømpris
         #
 
         service = ElectricityPriceService()
 
         prices = service.get_today_prices()
 
-        if prices:
+        now = datetime.now()
+
+        current_price = None
+
+        for price in prices:
+
+            if price.start <= now < price.end:
+
+                current_price = price
+                break
+
+        if current_price:
 
             self.spot_card.set_value(
-                f"{prices[0].spot_price_dkk:.2f} DKK"
+                f"{current_price.spot_price_dkk:.3f} DKK"
             )
 
-            self.spot_card.set_updated("Testdata")
+            self.spot_card.set_updated(
+                f"Live {now:%H:%M}"
+            )
+
+        elif prices:
+
+            #
+            # Fallback dersom vi er utenfor intervallet
+            #
+
+            self.spot_card.set_value(
+                f"{prices[0].spot_price_dkk:.3f} DKK"
+            )
+
+            self.spot_card.set_updated("Live")
