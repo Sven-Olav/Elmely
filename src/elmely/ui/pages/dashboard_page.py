@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QGridLayout, QWidget
 
 from elmely.services.electricity_price_service import ElectricityPriceService
@@ -10,6 +11,16 @@ class DashboardPage(QWidget):
 
     def __init__(self):
         super().__init__()
+
+        #
+        # Service
+        #
+
+        self.service = ElectricityPriceService()
+
+        #
+        # Layout
+        #
 
         layout = QGridLayout(self)
 
@@ -33,62 +44,63 @@ class DashboardPage(QWidget):
         # Totalpris
         #
 
-        layout.addWidget(
-            InfoCard(
-                "Totalpris",
-                "--,-- DKK",
-                "inkl. afgifter",
-            ),
-            0,
-            1,
+        self.total_card = InfoCard(
+            "Totalpris",
+            "--,-- DKK",
+            "inkl. afgifter",
         )
+
+        layout.addWidget(self.total_card, 0, 1)
 
         #
         # Valutakurs
         #
 
-        layout.addWidget(
-            InfoCard(
-                "Valutakurs",
-                "--,--",
-                "DKK → NOK",
-            ),
-            1,
-            0,
+        self.currency_card = InfoCard(
+            "Valutakurs",
+            "--,--",
+            "DKK → NOK",
         )
+
+        layout.addWidget(self.currency_card, 1, 0)
 
         #
         # Vær
         #
 
-        layout.addWidget(
-            InfoCard(
-                "Vær",
-                "-- °C",
-                "Bornholm",
-            ),
-            1,
-            1,
+        self.weather_card = InfoCard(
+            "Vær",
+            "-- °C",
+            "Bornholm",
         )
 
+        layout.addWidget(self.weather_card, 1, 1)
+
         #
-        # Live strømpris
+        # Første oppdatering
         #
 
-        service = ElectricityPriceService()
+        self.update_dashboard()
 
-        prices = service.get_today_prices()
+        #
+        # Automatisk oppdatering hvert 5. minutt
+        #
 
-        now = datetime.now()
+        self.timer = QTimer(self)
 
-        current_price = None
+        self.timer.timeout.connect(self.update_dashboard)
 
-        for price in prices:
+        self.timer.start(5 * 60 * 1000)
 
-            if price.start <= now < price.end:
+    def update_dashboard(self):
 
-                current_price = price
-                break
+        #
+        # Hent nye priser
+        #
+
+        self.service.refresh()
+
+        current_price = self.service.get_current_price()
 
         if current_price:
 
@@ -96,18 +108,6 @@ class DashboardPage(QWidget):
                 f"{current_price.spot_price_dkk:.3f} DKK"
             )
 
-            self.spot_card.set_updated(
-                f"Live {now:%H:%M}"
-            )
-
-        elif prices:
-
-            #
-            # Fallback dersom vi er utenfor intervallet
-            #
-
-            self.spot_card.set_value(
-                f"{prices[0].spot_price_dkk:.3f} DKK"
-            )
-
-            self.spot_card.set_updated("Live")
+        self.spot_card.set_updated(
+            f"Oppdatert: {datetime.now():%H:%M}"
+        )

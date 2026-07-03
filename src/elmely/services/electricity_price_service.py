@@ -119,10 +119,6 @@ class ElectricityPriceService:
             f"Created {len(prices)} hourly prices"
         )
 
-        #
-        # Lagre i cache
-        #
-
         self._cached_prices = prices
 
         return prices
@@ -166,3 +162,18 @@ class ElectricityPriceService:
             if price.start.date() == tomorrow
 
         ]
+
+    def get_current_price(self) -> Price | None:
+        """
+        Returnerer gjeldende timepris.
+        """
+
+        now = datetime.now()
+
+        for price in self.get_today_prices():
+
+            if price.start <= now < price.end:
+
+                return price
+
+        return None
