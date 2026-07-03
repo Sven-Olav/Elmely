@@ -4,6 +4,7 @@ from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QGridLayout, QWidget
 
 from elmely.services.electricity_price_service import ElectricityPriceService
+from elmely.services.exchange_rate_service import ExchangeRateService
 from elmely.services.tariff_service import TariffService
 from elmely.ui.widgets.info_card import InfoCard
 
@@ -19,6 +20,7 @@ class DashboardPage(QWidget):
 
         self.price_service = ElectricityPriceService()
         self.tariff_service = TariffService()
+        self.exchange_service = ExchangeRateService()
 
         #
         # Layout
@@ -94,6 +96,8 @@ class DashboardPage(QWidget):
 
     def update_dashboard(self):
 
+        updated = datetime.now()
+
         #
         # Oppdater strømpriser
         #
@@ -114,7 +118,7 @@ class DashboardPage(QWidget):
         )
 
         self.spot_card.set_updated(
-            f"Oppdatert: {datetime.now():%H:%M}"
+            f"Oppdatert: {updated:%H:%M}"
         )
 
         #
@@ -127,4 +131,22 @@ class DashboardPage(QWidget):
 
         self.total_card.set_value(
             f"{total_price.total:.3f} DKK"
+        )
+
+        self.total_card.set_updated(
+            f"Oppdatert: {updated:%H:%M}"
+        )
+
+        #
+        # Valutakurs
+        #
+
+        exchange_rate = self.exchange_service.get_rate()
+
+        self.currency_card.set_value(
+            f"{exchange_rate.rate:.4f}"
+        )
+
+        self.currency_card.set_updated(
+            f"Oppdatert: {exchange_rate.timestamp:%H:%M}"
         )
