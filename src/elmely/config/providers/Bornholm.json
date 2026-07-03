@@ -7,6 +7,7 @@
 
     "provider": {
         "name": "Bornholms Energi & Forsyning",
+        "network_operator": "TREFOR El-net Øst",
         "country": "DK",
         "currency": "DKK",
         "price_area": "DK2"
@@ -22,32 +23,60 @@
 
     "subscriptions": {
         "supplier_monthly": 20.00,
+        "network_monthly": 140.00,
         "energinet_monthly": 19.48
     },
 
     "electricity_tax": {
-        "summer": 0.0,
-        "winter": 0.0
+        "rate": 0.0
     },
 
-    "grid_tariffs": {
+    "network_tariffs": {
+
         "summer": {
-            "low": 0.0,
-            "high": 0.0,
-            "peak": 0.0
+
+            "low": 0.1164,
+            "high": 0.1746,
+            "peak": 0.4540
+
         },
 
         "winter": {
-            "low": 0.0,
-            "high": 0.0,
-            "peak": 0.0
+
+            "low": 0.1164,
+            "high": 0.3492,
+            "peak": 1.0476
+
         }
+
     },
 
-    "calculation": {
-        "vat_on_spot": true,
-        "vat_on_markup": true,
-        "vat_on_grid": true,
-        "vat_on_tax": true
+    "time_periods": {
+
+        "low": [
+            {
+                "from": 0,
+                "to": 6
+            }
+        ],
+
+        "high": [
+            {
+                "from": 6,
+                "to": 17
+            },
+            {
+                "from": 21,
+                "to": 24
+            }
+        ],
+
+        "peak": [
+            {
+                "from": 17,
+                "to": 21
+            }
+        ]
+
     }
 }

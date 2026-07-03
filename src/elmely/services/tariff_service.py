@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime
 from pathlib import Path
 
 from elmely.core.logger import log
@@ -13,9 +14,7 @@ class TariffService:
     def __init__(self):
 
         self.config_path = (
-            Path(__file__)
-            .resolve()
-            .parents[1]
+            Path(__file__).resolve().parents[1]
             / "config"
             / "providers"
             / "bornholm.json"
@@ -24,17 +23,14 @@ class TariffService:
         self._config = None
 
     @property
-    def config(self) -> dict:
+    def config(self):
 
         if self._config is None:
             self.load()
 
         return self._config
 
-    def load(self) -> dict:
-        """
-        Leser tariff-konfigurasjonen.
-        """
+    def load(self):
 
         log.info(
             f"Loading tariff configuration: {self.config_path.name}"
@@ -47,9 +43,7 @@ class TariffService:
 
             self._config = json.load(file)
 
-        log.info(
-            "Tariff configuration loaded successfully"
-        )
+        log.info("Tariff configuration loaded successfully")
 
         return self._config
 
@@ -63,11 +57,11 @@ class TariffService:
     # Provider
     #
 
-    def provider_name(self) -> str:
+    def provider_name(self):
 
         return self.config["provider"]["name"]
 
-    def price_area(self) -> str:
+    def price_area(self):
 
         return self.config["provider"]["price_area"]
 
@@ -75,21 +69,69 @@ class TariffService:
     # Satser
     #
 
-    def vat_rate(self) -> float:
+    def vat_rate(self):
 
         return self.config["vat"]["rate"]
 
-    def spot_markup(self) -> float:
+    def spot_markup(self):
 
         return self.config["spot"]["markup"]
 
-    def supplier_subscription(self) -> float:
+    def electricity_tax(self):
+
+        return self.config["electricity_tax"]["rate"]
+
+    def supplier_subscription(self):
 
         return self.config["subscriptions"]["supplier_monthly"]
 
-    def energinet_subscription(self) -> float:
+    def network_subscription(self):
+
+        return self.config["subscriptions"]["network_monthly"]
+
+    def energinet_subscription(self):
 
         return self.config["subscriptions"]["energinet_monthly"]
+
+    #
+    # Tariffvalg
+    #
+
+    def is_summer(self, timestamp: datetime) -> bool:
+
+        month = timestamp.month
+
+        return 4 <= month <= 9
+
+    def tariff_period(self, timestamp: datetime) -> str:
+
+        hour = timestamp.hour
+
+        periods = self.config["time_periods"]
+
+        for name, ranges in periods.items():
+
+            for period in ranges:
+
+                if period["from"] <= hour < period["to"]:
+
+                    return name
+
+        raise ValueError(
+            f"No tariff period found for hour {hour}"
+        )
+
+    def network_charge(self, timestamp: datetime) -> float:
+
+        season = (
+            "summer"
+            if self.is_summer(timestamp)
+            else "winter"
+        )
+
+        period = self.tariff_period(timestamp)
+
+        return self.config["network_tariffs"][season][period]
 
     #
     # Beregning
@@ -99,24 +141,16 @@ class TariffService:
         self,
         price: Price,
     ) -> TotalPrice:
-        """
-        Beregner total strømpris.
-
-        Foreløpig:
-        - Spotpris
-        - Spottillegg
-        - Nettkostnad (0,0)
-        - Elavgift (0,0)
-        - MVA
-        """
 
         spot = price.spot_price_dkk
 
         spot_markup = self.spot_markup()
 
-        network_charge = 0.0
+        network_charge = self.network_charge(
+            price.start
+        )
 
-        electricity_tax = 0.0
+        electricity_tax = self.electricity_tax()
 
         subtotal = (
             spot
