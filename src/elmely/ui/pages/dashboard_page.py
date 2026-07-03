@@ -4,6 +4,7 @@ from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QGridLayout, QWidget
 
 from elmely.services.electricity_price_service import ElectricityPriceService
+from elmely.services.tariff_service import TariffService
 from elmely.ui.widgets.info_card import InfoCard
 
 
@@ -13,10 +14,11 @@ class DashboardPage(QWidget):
         super().__init__()
 
         #
-        # Service
+        # Services
         #
 
-        self.service = ElectricityPriceService()
+        self.price_service = ElectricityPriceService()
+        self.tariff_service = TariffService()
 
         #
         # Layout
@@ -35,7 +37,7 @@ class DashboardPage(QWidget):
         self.spot_card = InfoCard(
             "Spotpris",
             "--,-- DKK",
-            "inkl. moms",
+            "Oppdatert",
         )
 
         layout.addWidget(self.spot_card, 0, 0)
@@ -47,7 +49,7 @@ class DashboardPage(QWidget):
         self.total_card = InfoCard(
             "Totalpris",
             "--,-- DKK",
-            "inkl. afgifter",
+            "inkl. avgifter",
         )
 
         layout.addWidget(self.total_card, 0, 1)
@@ -87,27 +89,42 @@ class DashboardPage(QWidget):
         #
 
         self.timer = QTimer(self)
-
         self.timer.timeout.connect(self.update_dashboard)
-
         self.timer.start(5 * 60 * 1000)
 
     def update_dashboard(self):
 
         #
-        # Hent nye priser
+        # Oppdater strømpriser
         #
 
-        self.service.refresh()
+        self.price_service.refresh()
 
-        current_price = self.service.get_current_price()
+        current_price = self.price_service.get_current_price()
 
-        if current_price:
+        if current_price is None:
+            return
 
-            self.spot_card.set_value(
-                f"{current_price.spot_price_dkk:.3f} DKK"
-            )
+        #
+        # Spotpris
+        #
+
+        self.spot_card.set_value(
+            f"{current_price.spot_price_dkk:.3f} DKK"
+        )
 
         self.spot_card.set_updated(
             f"Oppdatert: {datetime.now():%H:%M}"
+        )
+
+        #
+        # Totalpris
+        #
+
+        total_price = self.tariff_service.calculate_total_price(
+            current_price
+        )
+
+        self.total_card.set_value(
+            f"{total_price.total:.3f} DKK"
         )
