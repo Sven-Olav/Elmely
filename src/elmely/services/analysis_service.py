@@ -77,7 +77,7 @@ class AnalysisService:
             return []
 
         #
-        # Finn prisgrenser
+        # Finn relative prisgrenser
         #
 
         values = sorted(
@@ -123,6 +123,10 @@ class AnalysisService:
 
                 marker = TimelineMarker.EXPENSIVE
 
+            #
+            # Opprett TimelineItem
+            #
+
             items.append(
 
                 TimelineItem(
@@ -130,6 +134,16 @@ class AnalysisService:
                     timestamp=price.timestamp,
 
                     total_price=price.total,
+
+                    spot_price=price.spot,
+
+                    markup=price.spot_markup,
+
+                    network_charge=price.network_charge,
+
+                    electricity_tax=price.electricity_tax,
+
+                    vat=price.vat,
 
                     relative_level=relative,
 

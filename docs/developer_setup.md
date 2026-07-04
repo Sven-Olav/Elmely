@@ -131,7 +131,9 @@ Create commit:
 
 ```powershell
 git commit -m "Description of changes"
-```
+
+```push
+git push
 
 View history:
 

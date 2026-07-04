@@ -32,7 +32,7 @@ class DashboardPage(QWidget):
 
         self.spot_card = InfoCard("Spotpris", "--,-- DKK", "Oppdatert")
         self.total_card = InfoCard("Totalpris", "--,-- DKK", "inkl. avgifter")
-        self.currency_card = InfoCard("Valutakurs", "--,--", "DKK → NOK")
+        self.currency_card = InfoCard("Valutakurs", "--,--", "100 DKK")
         self.weather_card = InfoCard("Vær", "-- °C", "Bornholm")
 
         cards.addWidget(self.spot_card, 0, 0)
@@ -59,18 +59,56 @@ class DashboardPage(QWidget):
         if current_price is None:
             return
 
-        self.spot_card.set_value(f"{current_price.spot_price_dkk:.3f} DKK")
-        self.spot_card.set_updated(f"Oppdatert: {datetime.now():%H:%M}")
+        #
+        # Spotpris
+        #
 
-        total_price = self.tariff_service.calculate_total_price(current_price)
-        self.total_card.set_value(f"{total_price.total:.3f} DKK")
-        self.total_card.set_updated(f"Oppdatert: {datetime.now():%H:%M}")
+        self.spot_card.set_value(
+            f"{current_price.spot_price_dkk:.2f} DKK"
+        )
+
+        self.spot_card.set_updated(
+            f"Oppdatert: {datetime.now():%H:%M}"
+        )
+
+        #
+        # Totalpris
+        #
+
+        total_price = self.tariff_service.calculate_total_price(
+            current_price
+        )
+
+        self.total_card.set_value(
+            f"{total_price.total:.2f} DKK"
+        )
+
+        self.total_card.set_updated(
+            f"Oppdatert: {datetime.now():%H:%M}"
+        )
+
+        #
+        # Valutakurs
+        #
 
         rate = self.exchange_service.get_rate()
-        self.currency_card.set_value(f"{rate.rate:.4f}")
-        self.currency_card.set_updated(f"Oppdatert: {rate.timestamp:%H:%M}")
+
+        display_rate = rate.rate * 100
+
+        self.currency_card.set_value(
+            f"{display_rate:.2f} NOK"
+        )
+
+        self.currency_card.set_updated(
+            "100 DKK"
+        )
+
+        #
+        # Tidslinje
+        #
 
         prices = self.price_service.get_all_prices()
+
         if not prices:
             return
 
@@ -79,5 +117,8 @@ class DashboardPage(QWidget):
             for price in prices
         ]
 
-        items = self.analysis_service.create_timeline(total_prices)
+        items = self.analysis_service.create_timeline(
+            total_prices
+        )
+
         self.timeline.set_items(items)

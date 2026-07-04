@@ -43,6 +43,7 @@ class InfoCard(QFrame):
 
         self.value_label.setFont(value_font)
 
+
         #
         # Undertittel
         #
@@ -88,7 +89,7 @@ class InfoCard(QFrame):
     def set_subtitle(self, subtitle: str):
 
         self.subtitle_label.setText(subtitle)
-        
+
     def set_updated(self, updated: str):
 
         self.updated_label.setText(updated)

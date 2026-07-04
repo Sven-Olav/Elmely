@@ -3,7 +3,7 @@ from tkinter import font
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor, QFont, QPainter
-from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QWidget, QToolTip
 
 from elmely.models.timeline_item import TimelineItem
 from elmely.models.timeline_marker import TimelineMarker
@@ -20,7 +20,10 @@ class PriceTimelineWidget(QWidget):
         # Lav tidslinje
         #
 
+        self._hover_index = -1
+
         self.setMinimumHeight(48)
+        self.setMouseTracking(True)
 
     def set_items(
         self,
@@ -104,9 +107,43 @@ class PriceTimelineWidget(QWidget):
                 painter,
                 int(x),
                 item,
+                hovered=(index == self._hover_index),
             )
 
             previous_hour = hour
+
+
+    def mouseMoveEvent(self, event):
+
+        if not self.items:
+            return
+
+        spacing = self.width() / len(self.items)
+        index = int(event.position().x() / spacing)
+
+        if index < 0 or index >= len(self.items):
+            if self._hover_index != -1:
+                self._hover_index = -1
+                self.update()
+                QToolTip.hideText()
+            return
+
+        if index != self._hover_index:
+            self._hover_index = index
+            self.update()
+
+            QToolTip.showText(
+                event.globalPosition().toPoint(),
+                self.items[index].tooltip_text(),
+                self,
+            )
+
+    def leaveEvent(self, event):
+
+        self._hover_index = -1
+        self.update()
+        QToolTip.hideText()
+        super().leaveEvent(event)
 
     #
     # --------------------------------------------------
@@ -146,6 +183,7 @@ class PriceTimelineWidget(QWidget):
         painter: QPainter,
         x: int,
         item: TimelineItem,
+        hovered: bool = False,
     ):
 
         color = self._marker_color(
@@ -174,24 +212,28 @@ class PriceTimelineWidget(QWidget):
                 painter,
                 x,
                 color,
+                hovered,
             )
     def _draw_circle(
         self,
         painter: QPainter,
         x: int,
         color: QColor,
+        hovered: bool = False,
     ):
 
         painter.setPen(Qt.PenStyle.NoPen)
 
         painter.setBrush(color)
 
+        size = 12 if hovered else 10
+
         painter.drawEllipse(
-            x - 5,
-            20,
-            10,
-            10,
-    )
+            x - size // 2,
+            20 - (size - 10) // 2,
+            size,
+            size,
+        )
 
     def _draw_star(
         self,
