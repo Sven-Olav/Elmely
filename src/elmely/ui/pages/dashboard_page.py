@@ -1,12 +1,15 @@
 from datetime import datetime
 
 from PySide6.QtCore import QTimer
-from PySide6.QtWidgets import QGridLayout, QWidget
+from PySide6.QtWidgets import QGridLayout, QVBoxLayout, QWidget
 
+from elmely.services.analysis_service import AnalysisService
 from elmely.services.electricity_price_service import ElectricityPriceService
 from elmely.services.exchange_rate_service import ExchangeRateService
 from elmely.services.tariff_service import TariffService
+
 from elmely.ui.widgets.info_card import InfoCard
+from elmely.ui.widgets.price_timeline_widget import PriceTimelineWidget
 
 
 class DashboardPage(QWidget):
@@ -14,81 +17,35 @@ class DashboardPage(QWidget):
     def __init__(self):
         super().__init__()
 
-        #
-        # Services
-        #
-
         self.price_service = ElectricityPriceService()
         self.tariff_service = TariffService()
         self.exchange_service = ExchangeRateService()
+        self.analysis_service = AnalysisService()
 
-        #
-        # Layout
-        #
+        page_layout = QVBoxLayout(self)
+        page_layout.setContentsMargins(30, 30, 30, 30)
+        page_layout.setSpacing(18)
 
-        layout = QGridLayout(self)
+        cards = QGridLayout()
+        cards.setHorizontalSpacing(25)
+        cards.setVerticalSpacing(25)
 
-        layout.setContentsMargins(30, 30, 30, 30)
-        layout.setHorizontalSpacing(25)
-        layout.setVerticalSpacing(25)
+        self.spot_card = InfoCard("Spotpris", "--,-- DKK", "Oppdatert")
+        self.total_card = InfoCard("Totalpris", "--,-- DKK", "inkl. avgifter")
+        self.currency_card = InfoCard("Valutakurs", "--,--", "DKK → NOK")
+        self.weather_card = InfoCard("Vær", "-- °C", "Bornholm")
 
-        #
-        # Spotpris
-        #
+        cards.addWidget(self.spot_card, 0, 0)
+        cards.addWidget(self.total_card, 0, 1)
+        cards.addWidget(self.currency_card, 1, 0)
+        cards.addWidget(self.weather_card, 1, 1)
 
-        self.spot_card = InfoCard(
-            "Spotpris",
-            "--,-- DKK",
-            "Oppdatert",
-        )
+        page_layout.addLayout(cards)
 
-        layout.addWidget(self.spot_card, 0, 0)
-
-        #
-        # Totalpris
-        #
-
-        self.total_card = InfoCard(
-            "Totalpris",
-            "--,-- DKK",
-            "inkl. avgifter",
-        )
-
-        layout.addWidget(self.total_card, 0, 1)
-
-        #
-        # Valutakurs
-        #
-
-        self.currency_card = InfoCard(
-            "Valutakurs",
-            "--,--",
-            "DKK → NOK",
-        )
-
-        layout.addWidget(self.currency_card, 1, 0)
-
-        #
-        # Vær
-        #
-
-        self.weather_card = InfoCard(
-            "Vær",
-            "-- °C",
-            "Bornholm",
-        )
-
-        layout.addWidget(self.weather_card, 1, 1)
-
-        #
-        # Første oppdatering
-        #
+        self.timeline = PriceTimelineWidget()
+        page_layout.addWidget(self.timeline)
 
         self.update_dashboard()
-
-        #
-        # Automatisk oppdatering hvert 5. minutt
-        #
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_dashboard)
@@ -96,57 +53,31 @@ class DashboardPage(QWidget):
 
     def update_dashboard(self):
 
-        updated = datetime.now()
-
-        #
-        # Oppdater strømpriser
-        #
-
         self.price_service.refresh()
 
         current_price = self.price_service.get_current_price()
-
         if current_price is None:
             return
 
-        #
-        # Spotpris
-        #
+        self.spot_card.set_value(f"{current_price.spot_price_dkk:.3f} DKK")
+        self.spot_card.set_updated(f"Oppdatert: {datetime.now():%H:%M}")
 
-        self.spot_card.set_value(
-            f"{current_price.spot_price_dkk:.3f} DKK"
-        )
+        total_price = self.tariff_service.calculate_total_price(current_price)
+        self.total_card.set_value(f"{total_price.total:.3f} DKK")
+        self.total_card.set_updated(f"Oppdatert: {datetime.now():%H:%M}")
 
-        self.spot_card.set_updated(
-            f"Oppdatert: {updated:%H:%M}"
-        )
+        rate = self.exchange_service.get_rate()
+        self.currency_card.set_value(f"{rate.rate:.4f}")
+        self.currency_card.set_updated(f"Oppdatert: {rate.timestamp:%H:%M}")
 
-        #
-        # Totalpris
-        #
+        prices = self.price_service.get_all_prices()
+        if not prices:
+            return
 
-        total_price = self.tariff_service.calculate_total_price(
-            current_price
-        )
+        total_prices = [
+            self.tariff_service.calculate_total_price(price)
+            for price in prices
+        ]
 
-        self.total_card.set_value(
-            f"{total_price.total:.3f} DKK"
-        )
-
-        self.total_card.set_updated(
-            f"Oppdatert: {updated:%H:%M}"
-        )
-
-        #
-        # Valutakurs
-        #
-
-        exchange_rate = self.exchange_service.get_rate()
-
-        self.currency_card.set_value(
-            f"{exchange_rate.rate:.4f}"
-        )
-
-        self.currency_card.set_updated(
-            f"Oppdatert: {exchange_rate.timestamp:%H:%M}"
-        )
+        items = self.analysis_service.create_timeline(total_prices)
+        self.timeline.set_items(items)
