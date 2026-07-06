@@ -17,3 +17,5 @@ Modern Windows desktop application for monitoring electricity prices, weather an
 ## Status
 
 🚧 Under Development
+
+![alt text](image.png)

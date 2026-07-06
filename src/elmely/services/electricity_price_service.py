@@ -133,7 +133,23 @@ class ElectricityPriceService:
 
     def get_all_prices(self) -> list[Price]:
 
-        return self._get_live_prices()
+        now = datetime.now().replace(
+            minute=0,
+            second=0,
+            microsecond=0,
+        )
+
+        prices = [
+
+            price
+
+            for price in self._get_live_prices()
+
+            if price.start >= now
+
+        ]
+
+        return prices[:24]
 
     def get_today_prices(self) -> list[Price]:
 
