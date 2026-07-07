@@ -8,6 +8,7 @@ from elmely.core.logger import log
 from elmely.models.price import Price
 
 
+
 class ElectricityPriceService:
 
     API_URL = (
@@ -149,6 +150,10 @@ class ElectricityPriceService:
 
         ]
 
+        log.info(
+             f"Returning {len(prices[:24])} prices from {now:%Y-%m-%d %H:%M}"
+        )
+        
         return prices[:24]
 
     def get_today_prices(self) -> list[Price]:
