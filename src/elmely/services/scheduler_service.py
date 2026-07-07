@@ -53,10 +53,7 @@ class SchedulerService(QObject):
 
         log.info("Scheduler started")
 
-        self._schedule_next_update()
-        #
-        # Oppdater med én gang.
-        #
+        
 
         ok = self._callback()
 
@@ -67,7 +64,7 @@ class SchedulerService(QObject):
         else:
 
             self._schedule_retry()
-            
+
     def stop(self):
 
         self._timer.stop()
