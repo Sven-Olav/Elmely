@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from elmely.ui.weather_icons import get_weather_icon
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
@@ -12,6 +12,9 @@ from PySide6.QtWidgets import (
 )
 
 from elmely.models.weather import Weather
+from elmely.ui.widgets.forecast_hour_widget import (
+    ForecastHourWidget,
+)
 
 
 class WeatherWidget(QFrame):
@@ -22,12 +25,10 @@ class WeatherWidget(QFrame):
 
         self.setObjectName("InfoCard")
 
-        #
-        # Litt bredere enn InfoCard siden prognosen skal inn
-        # senere.
-        #
-
-        self.setMinimumSize(560, 180)
+        self.setMinimumSize(
+            560,
+            180,
+        )
 
         main_layout = QVBoxLayout(self)
 
@@ -46,12 +47,20 @@ class WeatherWidget(QFrame):
 
         title = QLabel("Vær")
 
-        title_font = QFont("Segoe UI", 10)
+        title_font = QFont(
+            "Segoe UI",
+            10,
+        )
+
         title_font.setBold(True)
 
-        title.setFont(title_font)
+        title.setFont(
+            title_font
+        )
 
-        main_layout.addWidget(title)
+        main_layout.addWidget(
+            title
+        )
 
         #
         # Øverste rad
@@ -61,11 +70,18 @@ class WeatherWidget(QFrame):
 
         self.icon_label = QLabel("☀")
 
-        icon_font = QFont("Segoe UI", 28)
+        icon_font = QFont(
+            "Segoe UI",
+            28,
+        )
 
-        self.icon_label.setFont(icon_font)
+        self.icon_label.setFont(
+            icon_font
+        )
 
-        self.temperature_label = QLabel("--.- °C")
+        self.temperature_label = QLabel(
+            "--.- °C"
+        )
 
         temperature_font = QFont(
             "Segoe UI",
@@ -103,7 +119,7 @@ class WeatherWidget(QFrame):
 
         top_layout.addWidget(
             self.updated_label,
-            alignment=Qt.AlignmentFlag.AlignTop,
+            alignment=Qt.AlignTop,
         )
 
         main_layout.addLayout(
@@ -137,35 +153,42 @@ class WeatherWidget(QFrame):
             self.rain_label,
         ):
 
-            label.setFont(info_font)
+            label.setFont(
+                info_font
+            )
 
-            main_layout.addWidget(label)
+            main_layout.addWidget(
+                label
+            )
 
         #
-        # Prognose
+        # 12 timers prognose
         #
 
-        self.forecast_label = QLabel(
-            "12-timers prognose kommer i neste steg..."
-        )
+        self.forecast_layout = QHBoxLayout()
 
-        forecast_font = QFont(
-            "Segoe UI",
-            9,
-        )
+        self.forecast_layout.setSpacing(4)
 
-        self.forecast_label.setFont(
-            forecast_font
-        )
+        self.forecast_widgets = []
 
-        self.forecast_label.setAlignment(
-            Qt.AlignmentFlag.AlignCenter
-        )
+        for _ in range(12):
 
-        main_layout.addStretch()
+            widget = ForecastHourWidget()
 
-        main_layout.addWidget(
-            self.forecast_label
+            self.forecast_widgets.append(
+                widget
+            )
+
+            self.forecast_layout.addWidget(
+                widget
+            )
+
+        self.forecast_layout.addStretch()
+
+        main_layout.addSpacing(10)
+
+        main_layout.addLayout(
+            self.forecast_layout
         )
 
     def set_weather(
@@ -189,13 +212,16 @@ class WeatherWidget(QFrame):
             f"Regn: {weather.precipitation_probability:d} %"
         )
 
-        #
-        # Foreløpig bruker vi tekst.
-        # SVG-ikoner kommer i M018C/D.
-        #
-
         self.icon_label.setText(
-            str(weather.weather_code)
+
+            get_weather_icon(
+
+                weather.weather_code,
+
+                weather.is_day,
+
+            )
+
         )
 
         if weather.updated_at is not None:
@@ -214,4 +240,20 @@ class WeatherWidget(QFrame):
 
             self.updated_label.setText(
                 "Oppdatert: --"
+            )
+
+        #
+        # Prognose
+        #
+
+        for widget, forecast in zip(
+
+            self.forecast_widgets,
+
+            weather.forecast,
+
+        ):
+
+            widget.set_forecast(
+                forecast
             )

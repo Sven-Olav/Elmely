@@ -108,16 +108,16 @@ class ExchangeRateService:
 
         )
     
-def convert(
-    self,
-    amount: float,
-    from_currency: str = "DKK",
-    to_currency: str = "NOK",
-) -> float:
+    def convert(
+        self,
+        amount: float,
+        from_currency: str = "DKK",
+        to_currency: str = "NOK",
+    ) -> float:
 
-    rate = self.get_rate(
-        from_currency,
-        to_currency,
-    )
+        rate = self.get_rate(
+            from_currency,
+            to_currency,
+        )
 
-    return amount * rate.rate
+        return amount * rate.rate
